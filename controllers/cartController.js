@@ -7,6 +7,7 @@ exports.addToCart = async (req, res) => {
 
     const userId = req.user.id;
 
+    
     if (!productId || !userId) {
       return res.status(403).json({
         success: false,
