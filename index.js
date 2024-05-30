@@ -22,6 +22,9 @@ app.use(
   })
 )
 
+app.get("/",(req,res)=>{
+  res.send("hlw");
+})
 
   // connect to cloudinary 
 cloudinaryConnect();
