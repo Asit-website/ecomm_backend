@@ -8,18 +8,18 @@ const {
   updateOrder,
   deleteOrder,
 } = require("../controllers/OrderController");
-const { isAdmin, isUser } = require("../middleware/auth");
+const { isAdmin, isUser, auth } = require("../middleware/auth");
 
 /** http://localhost:4000/api/v1/orders/..... */
 
-router.get("/", fetchOrderHistory, isAdmin);
+router.get("/orders/orderHistory", auth, fetchOrderHistory);
 
-router.post("/add-order", createOrder, isAdmin, isUser);
+router.post("/orders/add-order", createOrder);
 
-router.get("/:id", fetchSingleOrder, isAdmin);
+router.get("/orders/:orderId", fetchSingleOrder);
 
-router.put("/:id", updateOrder, isAdmin);
+router.put("/orders/:orderId", updateOrder);
 
-router.delete("/:id", deleteOrder, isAdmin);
+router.delete("/orders/:orderId", deleteOrder);
 
 module.exports = router;

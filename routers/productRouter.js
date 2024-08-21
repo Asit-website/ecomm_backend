@@ -58,6 +58,7 @@ router.post("/createCategory", auth, isAdmin, createCategory);
 router.delete("/deleteCategory/:categoryId", auth, isAdmin, deleteCategory);
 
 router.get("/showAllCategory", showAllCategory);
+
 router.get("/categoryPageDetails/:categoryId", fetchCategoryPageDetail);
 
 router.put("/updateCategory/:categoryId", auth, isAdmin, updateCategory);
@@ -85,6 +86,6 @@ router.put("/updateSubCategory/:subCategoryId", updateSubCategory);
 //                                      order routes
 // ********************************************************************************************************
 
-router.get("/getOrderHistory", auth, isUser, fetchOrderHistory);
+// router.get("/getOrderHistory", auth, isUser, fetchOrderHistory);
 
 module.exports = router;

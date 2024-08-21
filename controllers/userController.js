@@ -222,7 +222,7 @@ exports.login = async (req, res) => {
 // updateUser
 exports.updateUser = async (req, res) => {
   try {
-    const { name, description } = req.body;
+    const { firstName, lastName, phoneNumber } = req.body;
 
     const id = req.user.id;
     console.log("id", id);
@@ -230,12 +230,16 @@ exports.updateUser = async (req, res) => {
     const userDetails = await User.findById({ _id: id });
     console.log("userDetails", userDetails);
 
-    if (name) {
-      userDetails.name = name;
+    if (firstName) {
+      userDetails.firstName = firstName;
     }
 
-    if (description) {
-      userDetails.description = description;
+    if (lastName) {
+      userDetails.lastName = lastName;
+    }
+
+    if (phoneNumber) {
+      userDetails.phoneNumber = phoneNumber;
     }
 
     await userDetails.save();
@@ -375,13 +379,13 @@ exports.sendConnectMail = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "emai sent successfully ",
+      message: "email sent successfully ",
     });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
       success: false,
-      message: "Intenal server error ",
+      message: "Internal server error ",
     });
   }
 };

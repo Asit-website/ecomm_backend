@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const User = require("../models/userModel");
 const Order = require("../models/orderModel");
 const { ObjectId } = require("mongodb");
@@ -6,6 +7,14 @@ const Product = require("../models/productModel");
 exports.fetchOrderHistory = async (req, res) => {
   try {
     const userId = req.user.id;
+    console.log(userId);
+
+    if (!ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid user ID",
+      });
+    }
 
     const userObj = new ObjectId(userId);
 
@@ -13,7 +22,7 @@ exports.fetchOrderHistory = async (req, res) => {
       "products"
     );
 
-    if (!orderHistory.length) {
+    if (orderHistory.length === 0) {
       return res.status(403).json({
         success: false,
         message: "No order history found",
@@ -36,24 +45,12 @@ exports.fetchOrderHistory = async (req, res) => {
 
 exports.createOrder = async (req, res) => {
   try {
-    const { userId, products, shippingAddress } = req.body;
+    const { userId, products, totalAmount, shippingAddress } = req.body;
 
-    if (!userId || !products || !shippingAddress) {
+    if (!userId || !products || !totalAmount || !shippingAddress) {
       return res
         .status(400)
         .json({ success: false, message: "All fields are required" });
-    }
-
-    // Calculate totalAmount
-    let totalAmount = 0;
-    for (let productId of products) {
-      const product = await Product.findById(productId);
-      if (!product) {
-        return res
-          .status(404)
-          .json({ success: false, message: `Product not found: ${productId}` });
-      }
-      totalAmount += product.price;
     }
 
     // create the order
@@ -81,9 +78,13 @@ exports.createOrder = async (req, res) => {
 
 exports.fetchSingleOrder = async (req, res) => {
   try {
-    const orderId = req.params.id;
+    const { orderId } = req.params;
 
-    const order = await Order.findById(orderId)
+    console.log(`Fetching order with ID: ${orderId}`);
+
+    const order = await Order.findById({
+      _id: orderId,
+    })
       .populate("userId")
       .populate("products");
 
@@ -93,6 +94,12 @@ exports.fetchSingleOrder = async (req, res) => {
         message: "Order not found",
       });
     }
+
+    return res.status(200).json({
+      success: true,
+      message: "Successfully fetch order",
+      order,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).json({
@@ -104,10 +111,12 @@ exports.fetchSingleOrder = async (req, res) => {
 
 exports.updateOrder = async (req, res) => {
   try {
-    const orderId = req.params.id;
+    const { orderId } = req.params;
     const { orderStatus, shippingAddress } = req.body;
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById({
+      _id: orderId,
+    });
 
     if (!order) {
       return res.status(404).json({
@@ -137,11 +146,13 @@ exports.updateOrder = async (req, res) => {
 
 exports.deleteOrder = async (req, res) => {
   try {
-    const orderId = req.param.id;
+    const { orderId } = req.params;
 
-    const order = await Order.findByIdAndDelete(orderId);
+    const order = await Order.findByIdAndDelete({
+      _id: orderId,
+    });
 
-    if (!result) {
+    if (!order) {
       return res.status(404).json({
         success: false,
         message: "Order not found",
