@@ -1,18 +1,16 @@
+const dotenv = require("dotenv").config();
 const express = require("express");
 const app = express();
 const cors = require("cors");
-app.use(express.urlencoded({ extended: false }));
+const cookieParser = require("cookie-parser");
 const fileUpload = require("express-fileupload");
 
 const { cloudinaryConnect } = require("./config/cloudinary");
+const dbConnect = require("./config/database");
 
-app.use(express.json());
 app.use(cors());
-
-const port = 4000;
-
-const cookieParser = require("cookie-parser");
-
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(cookieParser());
 
 app.use(
@@ -29,28 +27,25 @@ app.get("/", (req, res) => {
 // connect to cloudinary
 cloudinaryConnect();
 
-const dbConnect = require("./config/database");
+// connect to database
 dbConnect();
 
+// Routes import
 const user = require("./routers/userRouter");
-
 const product = require("./routers/productRouter");
-
+const order = require("./routers/orderRouter");
 const cart = require("./routers/cartRouter");
 
-const order = require("./routers/orderRouter");
-
-app.use("/api/v1", cart);
-
+// routes declaration
 app.use("/api/v1", user);
-
 app.use("/api/v1", product);
-
-app.use("/api/v1/orders", order);
+app.use("/api/v1", order);
+app.use("/api/v1", cart);
 
 const Payments = require("./routers/Payments");
 app.use("/api/v1/payment", Payments);
 
-app.listen(port, () => {
-  console.log(`app listening on port ${port}`);
+const PORT = process.env.PORT || 4000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
